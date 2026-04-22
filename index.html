@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución Estratégica HSE - Ingema-Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19; /* Fondo oscuro muy sobrio */
+            color: #e2e8f0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Glassmorphism sutil y elegante */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.2);
+            transform: translateY(-2px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Tipografía degradada elegante */
+        .gradient-text {
+            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="selection:bg-sky-900 selection:text-sky-50">
+
+    <!-- Decoración de fondo abstracta -->
+    <div class="fixed inset-0 z-0 opacity-30 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] bg-sky-900/30"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] bg-slate-800/40"></div>
+    </div>
+
+    <!-- Encabezado / Hero -->
+    <header class="min-h-screen flex flex-col justify-center items-center relative px-6 z-10">
+        <div class="z-10 text-center max-w-4xl mx-auto gs-reveal">
+            <h2 class="text-sky-400 font-medium tracking-[0.2em] uppercase text-xs mb-6 border border-sky-400/30 inline-block px-4 py-1 rounded-full">Propuesta Ejecutiva Confidencial</h2>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight gradient-text leading-tight">Evolución Estratégica HSE</h1>
+            <p class="text-xl md:text-2xl text-slate-400 font-light mb-14">Identificación de Oportunidades y Soluciones para Ingema-Lab</p>
+            
+            <div class="inline-block p-[1px] rounded-full bg-gradient-to-r from-slate-700/50 to-slate-800/50 backdrop-blur-md">
+                <div class="px-8 py-3 rounded-full bg-[#0b0f19]/80 text-sm tracking-wide text-slate-300 flex flex-col md:flex-row items-center gap-6">
+                    <div class="text-center md:text-left">
+                        <span class="block text-xs uppercase text-slate-500">Preparado por</span>
+                        <span class="font-semibold text-white">Oswaldo Galán</span>
+                    </div>
+                    <div class="hidden md:block w-px h-8 bg-slate-700"></div>
+                    <div class="text-center md:text-left">
+                        <span class="block text-xs uppercase text-slate-500">Para</span>
+                        <span class="font-semibold text-white">Ing. Hugo Arizmendi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-12 animate-bounce opacity-50">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-5xl mx-auto px-6 py-24 space-y-40 relative z-10">
+        
+        <div class="mb-10 text-center gs-section">
+            <h3 class="text-3xl font-semibold text-slate-100 mb-4">Resumen de Oportunidades</h3>
+            <p class="text-slate-400 text-lg max-w-3xl mx-auto font-light leading-relaxed">
+                Análisis técnico del portafolio actual de servicios e implementación de soluciones estratégicas para consolidar a Ingema-Lab como líder en el cumplimiento corporativo de alto nivel.
+            </p>
+        </div>
+
+        <!-- Oportunidad 1 -->
+        <section class="gs-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4 sticky top-32">
+                    <div class="text-sky-500 font-mono text-xs tracking-widest mb-3 opacity-80"><i class="fa-solid fa-file-signature mr-2"></i> OPORTUNIDAD 01</div>
+                    <h3 class="text-3xl font-semibold text-slate-100 leading-tight">Actualización Normativa Ambiental</h3>
+                </div>
+                <div class="md:col-span-8 space-y-6">
+                    <div class="glass-card p-8">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Situación Actual</h4>
+                        <p class="text-slate-300 font-light leading-relaxed">
+                            En el portal oficial, se ofrecen servicios de análisis de calidad del agua referenciando la <strong>NOM-001-SEMARNAT-1996</strong>, una normativa que ha sido derogada y sustituida por la versión <strong>2021</strong> (la cual incluye parámetros críticos y actualizados como la toxicidad aguda).
+                        </p>
+                    </div>
+                    
+                    <div class="glass-card p-8 border-l-2 border-l-sky-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[50px] rounded-full"></div>
+                        <h4 class="text-sm font-semibold text-sky-400 uppercase tracking-widest mb-4"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Solución Propuesta</h4>
+                        <p class="text-slate-200 font-light leading-relaxed mb-8">
+                            Estructurar la actualización técnica y comercial inmediata de todo el catálogo de servicios ambientales. Capacitar al equipo comercial para que domine y comunique con precisión técnica los nuevos parámetros de cumplimiento corporativo exigidos por las autoridades federales.
+                        </p>
+                        <div class="bg-slate-900/50 p-5 rounded-md border border-slate-800">
+                            <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-2"></i> Resultado para Ingema-Lab</span>
+                            <span class="text-slate-300 text-sm font-light leading-relaxed">
+                                Mitigación inmediata de riesgos reputacionales ante corporativos multinacionales, aseguramiento de contratos vigentes y proyección de absoluta autoridad técnica frente a la competencia en licitaciones.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Oportunidad 2 -->
+        <section class="gs-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4 sticky top-32">
+                    <div class="text-sky-500 font-mono text-xs tracking-widest mb-3 opacity-80"><i class="fa-solid fa-users-viewfinder mr-2"></i> OPORTUNIDAD 02</div>
+                    <h3 class="text-3xl font-semibold text-slate-100 leading-tight">Integración de Normativas STPS Críticas</h3>
+                </div>
+                <div class="md:col-span-8 space-y-6">
+                    <div class="glass-card p-8">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Situación Actual</h4>
+                        <p class="text-slate-300 font-light leading-relaxed">
+                            El portafolio se centra en normativas tradicionales de higiene, omitiendo soluciones para la <strong>NOM-035-STPS-2018</strong> (Riesgos Psicosociales) y la <strong>NOM-036-1-STPS-2018</strong> (Riesgos Ergonómicos), normativas que actualmente concentran el mayor índice de auditorías y multas por parte de la STPS.
+                        </p>
+                    </div>
+                    
+                    <div class="glass-card p-8 border-l-2 border-l-sky-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[50px] rounded-full"></div>
+                        <h4 class="text-sm font-semibold text-sky-400 uppercase tracking-widest mb-4"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Solución Propuesta</h4>
+                        <p class="text-slate-200 font-light leading-relaxed mb-8">
+                            Desarrollar y aperturar la unidad de negocio "Cumplimiento STPS Integral". Me encargaré de implementar directamente las metodologías ergonómicas y psicosociales (RULA, REBA, cuestionarios oficiales), entregando un servicio "llave en mano" listo para comercializarse.
+                        </p>
+                        <div class="bg-slate-900/50 p-5 rounded-md border border-slate-800">
+                            <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-2"></i> Resultado para Ingema-Lab</span>
+                            <span class="text-slate-300 text-sm font-light leading-relaxed">
+                                Apertura inmediata de una nueva línea de ingresos altamente rentable, evitando que la base de clientes actual recurra a la competencia para resolver estas obligaciones legales ineludibles.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Oportunidad 3 -->
+        <section class="gs-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4 sticky top-32">
+                    <div class="text-sky-500 font-mono text-xs tracking-widest mb-3 opacity-80"><i class="fa-solid fa-diagram-project mr-2"></i> OPORTUNIDAD 03</div>
+                    <h3 class="text-3xl font-semibold text-slate-100 leading-tight">Transición a Modelo de Consultoría Integral</h3>
+                </div>
+                <div class="md:col-span-8 space-y-6">
+                    <div class="glass-card p-8">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Situación Actual</h4>
+                        <p class="text-slate-300 font-light leading-relaxed">
+                            El modelo operativo es transaccional: se ejecuta la medición, se entrega el dictamen y concluye el servicio. Esto deja al cliente con la carga de buscar a un tercero para diseñar la ingeniería o las medidas administrativas que solucionen los riesgos detectados.
+                        </p>
+                    </div>
+                    
+                    <div class="glass-card p-8 border-l-2 border-l-sky-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[50px] rounded-full"></div>
+                        <h4 class="text-sm font-semibold text-sky-400 uppercase tracking-widest mb-4"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Solución Propuesta</h4>
+                        <p class="text-slate-200 font-light leading-relaxed mb-8">
+                            Evolucionar la oferta aplicando la "Jerarquía de Controles". A partir de los resultados del laboratorio, diseñaré los Controles de Ingeniería o Administrativos pertinentes, transformando un simple análisis en un Programa de Seguridad y Salud a la medida.
+                        </p>
+                        <div class="bg-slate-900/50 p-5 rounded-md border border-slate-800">
+                            <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-2"></i> Resultado para Ingema-Lab</span>
+                            <span class="text-slate-300 text-sm font-light leading-relaxed">
+                                Fidelización de la cartera a largo plazo mediante contratos anuales de gestión (Outsourcing HSE), elevando sustancialmente el ticket promedio y posicionando a la empresa como un aliado estratégico indispensable.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Oportunidad 4 -->
+        <section class="gs-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4 sticky top-32">
+                    <div class="text-sky-500 font-mono text-xs tracking-widest mb-3 opacity-80"><i class="fa-solid fa-laptop-code mr-2"></i> OPORTUNIDAD 04</div>
+                    <h3 class="text-3xl font-semibold text-slate-100 leading-tight">Alineación de Identidad Digital Corporativa</h3>
+                </div>
+                <div class="md:col-span-8 space-y-6">
+                    <div class="glass-card p-8">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Situación Actual</h4>
+                        <p class="text-slate-300 font-light leading-relaxed">
+                            La presencia digital y el sitio web actual no reflejan el nivel técnico, la capacidad analítica ni la calidad del laboratorio. Esto genera fricción y desconfianza en la captación de cuentas corporativas o multinacionales que evalúan a sus proveedores desde el primer impacto digital.
+                        </p>
+                    </div>
+                    
+                    <div class="glass-card p-8 border-l-2 border-l-sky-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[50px] rounded-full"></div>
+                        <h4 class="text-sm font-semibold text-sky-400 uppercase tracking-widest mb-4"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Solución Propuesta</h4>
+                        <p class="text-slate-200 font-light leading-relaxed mb-8">
+                            Modernizar la arquitectura visual y la experiencia de usuario (UX) del sitio web para que actúe como una verdadera herramienta de ventas B2B. Implementar un diseño sobrio, tecnológico y de alta gama que comunique vanguardia y certidumbre corporativa.
+                        </p>
+                        <div class="bg-slate-900/50 p-5 rounded-md border border-slate-800">
+                            <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-2"></i> Resultado para Ingema-Lab</span>
+                            <span class="text-slate-300 text-sm font-light leading-relaxed">
+                                Aumento inmediato en la tasa de conversión de leads corporativos, facilitando el cierre de licitaciones al proyectar a Ingema-Lab como un aliado de talla internacional desde el primer clic.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Oportunidad 5 -->
+        <section class="gs-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+                <div class="md:col-span-4 sticky top-32">
+                    <div class="text-sky-500 font-mono text-xs tracking-widest mb-3 opacity-80"><i class="fa-solid fa-globe mr-2"></i> OPORTUNIDAD 05</div>
+                    <h3 class="text-3xl font-semibold text-slate-100 leading-tight">Expansión hacia Normativas Internacionales (ISO/ESG)</h3>
+                </div>
+                <div class="md:col-span-8 space-y-6">
+                    <div class="glass-card p-8">
+                        <h4 class="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Situación Actual</h4>
+                        <p class="text-slate-300 font-light leading-relaxed">
+                            El enfoque predominante es el cumplimiento normativo nacional (SEMARNAT/STPS). Sin embargo, el mercado corporativo global hoy exige a toda su cadena de suministro estar alineada a normativas ISO y reportar activamente criterios ESG (Ambiental, Social y Gobernanza).
+                        </p>
+                    </div>
+                    
+                    <div class="glass-card p-8 border-l-2 border-l-sky-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-[50px] rounded-full"></div>
+                        <h4 class="text-sm font-semibold text-sky-400 uppercase tracking-widest mb-4"><i class="fa-solid fa-screwdriver-wrench mr-2"></i> Solución Propuesta</h4>
+                        <p class="text-slate-200 font-light leading-relaxed mb-8">
+                            Preparar la infraestructura técnica y consultiva para que Ingema-Lab acompañe a las empresas en su transición hacia certificaciones ISO 14001 e ISO 45001, así como en la estructuración técnica de sus reportes de sustentabilidad corporativos (ESG).
+                        </p>
+                        <div class="bg-slate-900/50 p-5 rounded-md border border-slate-800">
+                            <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"><i class="fa-solid fa-chart-pie mr-2"></i> Resultado para Ingema-Lab</span>
+                            <span class="text-slate-300 text-sm font-light leading-relaxed">
+                                Ingema-Lab deja de competir por precio en el mercado local para empezar a competir por valor en el exclusivo mercado de la cadena de suministro global y empresas transnacionales (Tier 1 y Tier 2).
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="gs-section pt-16 pb-8 border-t border-slate-800/50 mt-16 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">El siguiente paso</h2>
+            <p class="text-slate-400 text-xl font-light mb-12 max-w-2xl mx-auto">
+                Tenemos un mapa claro de las brechas y las soluciones que multiplicarán el valor corporativo de Ingema-Lab.
+            </p>
+            
+            <div class="inline-block glass-card px-12 py-8 relative overflow-hidden group cursor-default">
+                <div class="absolute inset-0 bg-gradient-to-r from-sky-600/20 to-sky-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <h3 class="text-2xl md:text-3xl font-semibold text-sky-400 relative z-10">&iquest;Con qu&eacute; quieres que inicie?</h3>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 text-center text-slate-600 text-xs tracking-widest uppercase border-t border-slate-800/80 mt-24">
+        <p>&copy; 2026 Oswaldo Galán &mdash; Consultor Senior HSE / SST</p>
+    </footer>
+
+    <script>
+        // Inicialización de animaciones GSAP
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Animación del Hero
+            gsap.fromTo(".gs-reveal", 
+                { y: 40, opacity: 0 }, 
+                { y: 0, opacity: 1, duration: 1.2, stagger: 0.15, ease: "power2.out", delay: 0.2 }
+            );
+
+            // Animación de las secciones al hacer scroll
+            gsap.utils.toArray('.gs-section').forEach(section => {
+                gsap.fromTo(section,
+                    { y: 50, opacity: 0 },
+                    {
+                        scrollTrigger: {
+                            trigger: section,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        ease: "power2.out"
+                    }
+                );
+            });
+        });
+    </script>
+</body>
+</html>
