@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmaPanel — Control de Inventario en Tiempo Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg:       #050c1a;
+  --surface:  #0d1b2e;
+  --surface2: #112236;
+  --border:   rgba(255,255,255,0.07);
+  --blue:     #3b82f6;
+  --cyan:     #06b6d4;
+  --green:    #22c55e;
+  --yellow:   #f59e0b;
+  --red:      #ef4444;
+  --text:     #e2e8f0;
+  --muted:    #64748b;
+  --radius:   12px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ── HEADER ── */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px);
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg,#3b82f6,#06b6d4); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.logo-name { font-weight: 700; font-size: 17px; }
+.logo-name span { color: var(--cyan); }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.status-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--green); font-weight: 600; letter-spacing: 0.5px; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
+.timestamp { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.btn { padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+
+/* ── MAIN LAYOUT ── */
+main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+/* ── KPI CARDS ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.kpi-card:hover { transform: translateY(-2px); border-color: rgba(59,130,246,0.3); }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.kpi-card.blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+.kpi-card.green::before { background: linear-gradient(90deg, var(--green), #16a34a); }
+.kpi-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #d97706); }
+.kpi-card.red::before { background: linear-gradient(90deg, var(--red), #dc2626); }
+.kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+.kpi-value { font-size: 32px; font-weight: 700; font-family: 'JetBrains Mono', monospace; line-height: 1; margin-bottom: 6px; }
+.kpi-value.blue { color: var(--blue); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.yellow { color: var(--yellow); }
+.kpi-value.red { color: var(--red); }
+.kpi-sub { font-size: 12px; color: var(--muted); }
+
+/* ── TOOLBAR ── */
+.toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 13px; font-family: 'Inter', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--blue); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 15px; }
+.filter-btn { padding: 9px 16px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.filter-btn:hover, .filter-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+
+/* ── TABLE ── */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(59,130,246,0.04); }
+td { padding: 13px 16px; font-size: 13px; vertical-align: middle; }
+.product-name { font-weight: 600; color: var(--text); }
+.product-sku { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.cat-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.cat-medicamento { background: rgba(59,130,246,0.15); color: var(--blue); }
+.cat-insumo { background: rgba(6,182,212,0.15); color: var(--cyan); }
+.cat-consumible { background: rgba(168,85,247,0.12); color: #a855f7; }
+
+.stock-cell { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 14px; }
+
+/* progress bar */
+.bar-wrap { width: 100px; background: rgba(255,255,255,0.06); border-radius: 4px; height: 6px; margin-top: 4px; }
+.bar-fill { height: 6px; border-radius: 4px; transition: width 0.6s ease; }
+
+.status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+.status-ok   { background: rgba(34,197,94,0.12);  color: var(--green); }
+.status-low  { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.status-crit { background: rgba(239,68,68,0.12);  color: var(--red); }
+.status-over { background: rgba(59,130,246,0.12); color: var(--blue); }
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-ok   { background: var(--green); }
+.dot-low  { background: var(--yellow); }
+.dot-crit { background: var(--red); animation: pulse 1s infinite; }
+.dot-over { background: var(--blue); }
+
+.delta { font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+.delta-up   { color: var(--green); }
+.delta-down { color: var(--red); }
+.delta-none { color: var(--muted); }
+
+.action-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); padding: 5px 10px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.action-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── BOTTOM CHARTS ROW ── */
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.chart-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+.mini-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mini-bar-label { font-size: 11px; color: var(--muted); width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+.mini-bar-val { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text); width: 36px; text-align: right; }
+
+/* alert feed */
+.alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.alert-item:last-child { border-bottom: none; }
+.alert-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.alert-icon.red    { background: rgba(239,68,68,0.15); }
+.alert-icon.yellow { background: rgba(245,158,11,0.15); }
+.alert-icon.green  { background: rgba(34,197,94,0.15); }
+.alert-text { font-size: 12px; line-height: 1.5; }
+.alert-text strong { color: var(--text); font-weight: 600; }
+.alert-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">💊</div>
+    <div>
+      <div class="logo-name">Farma<span>Panel</span></div>
+      <div style="font-size:10px;color:var(--muted)">Control de Inventario</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge"><div class="pulse"></div>EN VIVO</div>
+    <div class="timestamp" id="clock">--:--:--</div>
+    <button class="btn btn-primary">+ Entrada</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total Productos</div>
+      <div class="kpi-value blue" id="kpi-total">--</div>
+      <div class="kpi-sub">SKUs activos</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Stock OK</div>
+      <div class="kpi-value green" id="kpi-ok">--</div>
+      <div class="kpi-sub">Dentro de rango</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Stock Bajo</div>
+      <div class="kpi-value yellow" id="kpi-low">--</div>
+      <div class="kpi-sub">Por debajo del mínimo</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Crítico / Agotado</div>
+      <div class="kpi-value red" id="kpi-crit">--</div>
+      <div class="kpi-sub">Requiere reorden urgente</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Buscar producto, SKU o categoría...">
+    </div>
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="ok">OK</button>
+    <button class="filter-btn" data-filter="low">Stock Bajo</button>
+    <button class="filter-btn" data-filter="crit">Crítico</button>
+    <button class="filter-btn" data-filter="over">Sobrestock</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table id="inv-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Actual</th>
+          <th>Nivel</th>
+          <th>Mín / Máx</th>
+          <th>Estado</th>
+          <th>Δ Hoy</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="bottom-grid">
+    <div class="chart-card">
+      <div class="chart-title">📊 Productos con Mayor Rotación (unidades/día)</div>
+      <div id="rotation-chart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">🔔 Alertas Recientes</div>
+      <div id="alert-feed"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+const products = [
+  { id: 1,  name: 'Amoxicilina 500mg',        sku: 'MED-001', cat: 'medicamento', stock: 142, min: 50,  max: 300, rotation: 34 },
+  { id: 2,  name: 'Paracetamol 500mg c/20',   sku: 'MED-002', cat: 'medicamento', stock: 28,  min: 60,  max: 400, rotation: 89 },
+  { id: 3,  name: 'Ibuprofeno 400mg c/10',    sku: 'MED-003', cat: 'medicamento', stock: 6,   min: 40,  max: 250, rotation: 56 },
+  { id: 4,  name: 'Metformina 850mg c/30',    sku: 'MED-004', cat: 'medicamento', stock: 210, min: 30,  max: 200, rotation: 21 },
+  { id: 5,  name: 'Losartán 50mg c/30',       sku: 'MED-005', cat: 'medicamento', stock: 95,  min: 25,  max: 180, rotation: 18 },
+  { id: 6,  name: 'Omeprazol 20mg c/14',      sku: 'MED-006', cat: 'medicamento', stock: 77,  min: 40,  max: 220, rotation: 44 },
+  { id: 7,  name: 'Clonazepam 2mg c/30',      sku: 'MED-007', cat: 'medicamento', stock: 14,  min: 20,  max: 100, rotation: 11 },
+  { id: 8,  name: 'Azitromicina 500mg c/3',   sku: 'MED-008', cat: 'medicamento', stock: 53,  min: 20,  max: 150, rotation: 28 },
+  { id: 9,  name: 'Jeringas 5ml c/100',       sku: 'INS-001', cat: 'insumo',      stock: 320, min: 100, max: 600, rotation: 62 },
+  { id: 10, name: 'Guantes Nitrilo T/M c/50', sku: 'INS-002', cat: 'insumo',      stock: 44,  min: 50,  max: 300, rotation: 37 },
+  { id: 11, name: 'Gasas Estériles 10x10',    sku: 'INS-003', cat: 'insumo',      stock: 198, min: 80,  max: 400, rotation: 29 },
+  { id: 12, name: 'Alcohol Isopropílico 1L',  sku: 'CON-001', cat: 'consumible',  stock: 31,  min: 40,  max: 200, rotation: 16 },
+  { id: 13, name: 'Cubrebocas KN95 c/10',     sku: 'CON-002', cat: 'consumible',  stock: 0,   min: 30,  max: 150, rotation: 20 },
+  { id: 14, name: 'Termómetros Digitales',    sku: 'INS-004', cat: 'insumo',      stock: 22,  min: 10,  max: 60,  rotation: 5  },
+  { id: 15, name: 'Suero Fisiológico 500ml',  sku: 'MED-009', cat: 'medicamento', stock: 88,  min: 30,  max: 200, rotation: 41 },
+];
+
+let deltas = {};
+products.forEach(p => deltas[p.id] = 0);
+
+let activeFilter = 'all';
+let searchTerm = '';
+
+function getStatus(p) {
+  if (p.stock === 0) return 'crit';
+  if (p.stock < p.min) return p.stock < p.min * 0.5 ? 'crit' : 'low';
+  if (p.stock > p.max) return 'over';
+  return 'ok';
+}
+
+function statusHTML(status) {
+  const map = {
+    ok:   { label: 'Stock OK',     cls: 'status-ok',   dot: 'dot-ok'   },
+    low:  { label: 'Stock Bajo',   cls: 'status-low',  dot: 'dot-low'  },
+    crit: { label: 'Crítico',      cls: 'status-crit', dot: 'dot-crit' },
+    over: { label: 'Sobrestock',   cls: 'status-over', dot: 'dot-over' },
+  };
+  const s = map[status];
+  return `<span class="status-pill ${s.cls}"><span class="dot ${s.dot}"></span>${s.label}</span>`;
+}
+
+function catHTML(cat) {
+  const map = { medicamento: 'cat-medicamento', insumo: 'cat-insumo', consumible: 'cat-consumible' };
+  return `<span class="cat-badge ${map[cat]}">${cat}</span>`;
+}
+
+function barColor(status) {
+  return { ok: '#22c55e', low: '#f59e0b', crit: '#ef4444', over: '#3b82f6' }[status];
+}
+
+function barPct(p) {
+  return Math.min(100, Math.round((p.stock / p.max) * 100));
+}
+
+function deltaHTML(id) {
+  const d = deltas[id];
+  if (d > 0) return `<span class="delta delta-up">+${d}</span>`;
+  if (d < 0) return `<span class="delta delta-down">${d}</span>`;
+  return `<span class="delta delta-none">—</span>`;
+}
+
+function renderTable() {
+  const filtered = products.filter(p => {
+    const status = getStatus(p);
+    const matchFilter = activeFilter === 'all' || status === activeFilter;
+    const matchSearch = p.name.toLowerCase().includes(searchTerm) ||
+                        p.sku.toLowerCase().includes(searchTerm) ||
+                        p.cat.includes(searchTerm);
+    return matchFilter && matchSearch;
+  });
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = filtered.map(p => {
+    const status = getStatus(p);
+    const pct = barPct(p);
+    return `<tr data-id="${p.id}">
+      <td>
+        <div class="product-name">${p.name}</div>
+        <div class="product-sku">${p.sku}</div>
+      </td>
+      <td>${catHTML(p.cat)}</td>
+      <td><span class="stock-cell" style="color:${barColor(status)}">${p.stock}</span></td>
+      <td>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px">${pct}%</div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${barColor(status)}"></div></div>
+      </td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">${p.min} / ${p.max}</td>
+      <td>${statusHTML(status)}</td>
+      <td>${deltaHTML(p.id)}</td>
+      <td><button class="action-btn">Ajustar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderKPIs() {
+  const statuses = products.map(getStatus);
+  document.getElementById('kpi-total').textContent = products.length;
+  document.getElementById('kpi-ok').textContent   = statuses.filter(s => s === 'ok').length;
+  document.getElementById('kpi-low').textContent  = statuses.filter(s => s === 'low').length;
+  document.getElementById('kpi-crit').textContent = statuses.filter(s => s === 'crit').length;
+}
+
+function renderRotation() {
+  const sorted = [...products].sort((a,b) => b.rotation - a.rotation).slice(0,6);
+  const maxR = sorted[0].rotation;
+  const colors = ['#3b82f6','#06b6d4','#22c55e','#a855f7','#f59e0b','#ef4444'];
+  document.getElementById('rotation-chart').innerHTML = sorted.map((p,i) => `
+    <div class="mini-bar-row">
+      <div class="mini-bar-label" title="${p.name}">${p.name}</div>
+      <div class="mini-bar-track">
+        <div class="mini-bar-fill" style="width:${Math.round((p.rotation/maxR)*100)}%;background:${colors[i]}"></div>
+      </div>
+      <div class="mini-bar-val">${p.rotation}</div>
+    </div>`).join('');
+}
+
+const alertMessages = [];
+function pushAlert(type, msg) {
+  const now = new Date();
+  const t = now.toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  alertMessages.unshift({ type, msg, time: t });
+  if (alertMessages.length > 6) alertMessages.pop();
+  const icons = { red: '🚨', yellow: '⚠️', green: '✅' };
+  document.getElementById('alert-feed').innerHTML = alertMessages.map(a => `
+    <div class="alert-item">
+      <div class="alert-icon ${a.type}">${icons[a.type]}</div>
+      <div>
+        <div class="alert-text">${a.msg}</div>
+        <div class="alert-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// Clock
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('es-MX');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Simulate live stock changes
+function simulateLive() {
+  const idx = Math.floor(Math.random() * products.length);
+  const p = products[idx];
+  const change = Math.floor(Math.random() * 10) - 3;
+  const oldStock = p.stock;
+  p.stock = Math.max(0, p.stock + change);
+  deltas[p.id] = (deltas[p.id] || 0) + (p.stock - oldStock);
+
+  const newStatus = getStatus(p);
+  if (newStatus === 'crit' && p.stock !== oldStock)
+    pushAlert('red', `<strong>${p.name}</strong>: stock crítico (${p.stock} uds). Reorden urgente.`);
+  else if (newStatus === 'low' && oldStock >= p.min)
+    pushAlert('yellow', `<strong>${p.name}</strong>: cayó por debajo del mínimo (${p.stock}/${p.min}).`);
+  else if (p.stock > oldStock && newStatus === 'ok')
+    pushAlert('green', `<strong>${p.name}</strong>: reabastecido. Stock actual: ${p.stock} uds.`);
+
+  renderTable();
+  renderKPIs();
+}
+
+// Filters
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    renderTable();
+  });
+});
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.toLowerCase();
+  renderTable();
+});
+
+// Initial alerts
+pushAlert('red', '<strong>Cubrebocas KN95</strong>: agotado. Reorden inmediato requerido.');
+pushAlert('yellow', '<strong>Paracetamol 500mg</strong>: stock bajo el mínimo (28/60).');
+pushAlert('yellow', '<strong>Ibuprofeno 400mg</strong>: stock crítico (6/40).');
+
+// Init
+renderKPIs();
+renderTable();
+renderRotation();
+
+// Live updates every 3 seconds
+setInterval(simulateLive, 3000);
+</script>
+</body>
+</html>
