@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico SST — Panel de Cumplimiento Regulatorio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --red:     #dc2626;
+  --red-bg:  #fef2f2;
+  --amber:   #d97706;
+  --amb-bg:  #fffbeb;
+  --green:   #16a34a;
+  --grn-bg:  #f0fdf4;
+  --blue:    #2563eb;
+  --blu-bg:  #eff6ff;
+  --slate:   #1e293b;
+  --slate2:  #334155;
+  --muted:   #64748b;
+  --border:  #e2e8f0;
+  --bg:      #f8fafc;
+  --white:   #ffffff;
+  --radius:  10px;
+}
+html, body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--slate); font-size: 14px; }
+
+/* ── HEADER ── */
+header {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 28px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.hdr-left { display: flex; align-items: center; gap: 14px; }
+.hdr-badge {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  color: white; padding: 6px 14px; border-radius: 6px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+}
+.hdr-title { font-size: 14px; font-weight: 600; color: var(--slate2); }
+.hdr-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.hdr-right { display: flex; align-items: center; gap: 12px; }
+.hdr-tag {
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  background: var(--red-bg); color: var(--red); border: 1px solid #fecaca;
+  display: flex; align-items: center; gap: 5px;
+}
+.hdr-tag::before { content: '⚠️'; font-size: 10px; }
+.hdr-date { font-size: 11px; color: var(--muted); }
+.hdr-btn {
+  padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; border: none; background: var(--slate); color: white; transition: background 0.2s;
+}
+.hdr-btn:hover { background: var(--slate2); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; height: calc(100vh - 58px); overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px; flex-shrink: 0; background: var(--white);
+  border-right: 1px solid var(--border); overflow-y: auto;
+  padding: 16px 0;
+}
+.sb-section { padding: 0 12px; margin-bottom: 6px; }
+.sb-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 8px 8px 4px; }
+.sb-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 7px; cursor: pointer;
+  font-size: 12px; font-weight: 500; color: var(--slate2);
+  transition: background 0.15s;
+}
+.sb-item:hover { background: var(--bg); }
+.sb-item.active { background: var(--blu-bg); color: var(--blue); font-weight: 600; }
+.sb-icon { width: 18px; text-align: center; font-size: 13px; }
+.sb-badge {
+  margin-left: auto; padding: 1px 6px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; background: var(--red-bg); color: var(--red);
+}
+.sb-badge.amb { background: var(--amb-bg); color: var(--amber); }
+.sb-badge.grn { background: var(--grn-bg); color: var(--green); }
+.sb-divider { height: 1px; background: var(--border); margin: 8px 12px; }
+
+/* ── MAIN ── */
+main { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+/* ── KPI GRID ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.kpi {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 20px; position: relative; overflow: hidden;
+}
+.kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.kpi.red::before   { background: var(--red); }
+.kpi.amber::before { background: var(--amber); }
+.kpi.blue::before  { background: var(--blue); }
+.kpi.green::before { background: var(--green); }
+.kpi-icon { font-size: 22px; margin-bottom: 10px; }
+.kpi-value { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+.kpi-value.red   { color: var(--red); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-value.blue  { color: var(--blue); }
+.kpi-value.green { color: var(--green); }
+.kpi-label { font-size: 12px; font-weight: 600; color: var(--slate2); margin-bottom: 2px; }
+.kpi-sub { font-size: 11px; color: var(--muted); }
+.kpi-risk {
+  position: absolute; top: 18px; right: 16px;
+  padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;
+}
+.kpi-risk.red   { background: var(--red-bg); color: var(--red); }
+.kpi-risk.amber { background: var(--amb-bg); color: var(--amber); }
+
+/* ── TWO-COL ── */
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+.card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.card-title { font-size: 13px; font-weight: 700; color: var(--slate); margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
+.card-sub { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+
+/* compliance bars */
+.norm-row { margin-bottom: 14px; }
+.norm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.norm-name { font-size: 12px; font-weight: 600; color: var(--slate2); }
+.norm-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
+.norm-pct.red   { color: var(--red); }
+.norm-pct.amber { color: var(--amber); }
+.norm-pct.green { color: var(--green); }
+.norm-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; position: relative; }
+.norm-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(.22,.61,.36,1); }
+.norm-fill.red   { background: linear-gradient(90deg, var(--red), #ef4444); }
+.norm-fill.amber { background: linear-gradient(90deg, var(--amber), #f59e0b); }
+.norm-fill.green { background: linear-gradient(90deg, var(--green), #22c55e); }
+.norm-meta { display: flex; justify-content: space-between; margin-top: 4px; }
+.norm-meta span { font-size: 10px; color: var(--muted); }
+.norm-badge { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.norm-badge.blocker { background: var(--red-bg); color: var(--red); }
+.norm-badge.urgente { background: var(--amb-bg); color: var(--amber); }
+.norm-badge.ok      { background: var(--grn-bg); color: var(--green); }
+
+/* score ring */
+.score-ring-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0 16px; }
+.score-ring { position: relative; width: 130px; height: 130px; margin-bottom: 14px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring-val {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+.score-ring-val .num { font-size: 30px; font-weight: 800; color: var(--red); }
+.score-ring-val .denom { font-size: 11px; color: var(--muted); }
+.score-legend { width: 100%; }
+.legend-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+.legend-row:last-child { border-bottom: none; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
+.legend-label { display: flex; align-items: center; color: var(--slate2); }
+.legend-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 12px; }
+
+/* risk matrix */
+.matrix-grid {
+  display: grid; grid-template-columns: 24px 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 24px;
+  gap: 3px; height: 200px;
+}
+.mat-cell {
+  border-radius: 4px; display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; color: rgba(0,0,0,0.35);
+  position: relative;
+}
+.mat-label { font-size: 9px; color: var(--muted); display: flex; align-items: center; justify-content: center; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); }
+.mat-label-b { font-size: 9px; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+.m-low    { background: #dcfce7; }
+.m-mod    { background: #fef9c3; }
+.m-high   { background: #fee2e2; }
+.m-crit   { background: #fecaca; }
+.m-blank  { background: transparent; }
+.mat-dot  { width: 14px; height: 14px; border-radius: 50%; position: absolute; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); font-size: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: default; }
+.mat-dot:hover::after { content: attr(title); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: var(--slate); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 10; }
+
+/* hallazgos list */
+.hallazgo-item {
+  display: flex; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.hallazgo-item:last-child { border-bottom: none; }
+.h-sev { width: 6px; border-radius: 3px; flex-shrink: 0; }
+.h-sev.red   { background: var(--red); }
+.h-sev.amber { background: var(--amber); }
+.h-sev.green { background: var(--green); }
+.h-body { flex: 1; }
+.h-title { font-size: 12px; font-weight: 600; color: var(--slate2); margin-bottom: 3px; }
+.h-norm { font-size: 10px; color: var(--muted); }
+.h-chip {
+  padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;
+  align-self: flex-start; white-space: nowrap; flex-shrink: 0;
+}
+.h-chip.blocker { background: var(--red-bg); color: var(--red); }
+.h-chip.urgente { background: var(--amb-bg); color: var(--amber); }
+.h-chip.proceso { background: var(--blu-bg); color: var(--blue); }
+
+/* timeline */
+.timeline-item { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+.timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 30px; bottom: 0; width: 1px; background: var(--border); }
+.tl-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; border: 2px solid; }
+.tl-dot.done  { background: var(--grn-bg); border-color: var(--green); }
+.tl-dot.active{ background: var(--blu-bg); border-color: var(--blue); animation: pulse-tl 1.5s infinite; }
+.tl-dot.pend  { background: var(--bg); border-color: var(--border); }
+@keyframes pulse-tl { 0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,0.3)} 50%{box-shadow:0 0 0 6px rgba(37,99,235,0)} }
+.tl-content { flex: 1; }
+.tl-name { font-size: 12px; font-weight: 600; color: var(--slate2); }
+.tl-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.tl-date { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); margin-top: 4px; }
+
+/* exposure card */
+.exposure-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.exposure-item:last-child { border-bottom: none; }
+.exp-norm { font-size: 12px; font-weight: 500; color: var(--slate2); }
+.exp-range { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--red); font-weight: 600; }
+.exposure-total { margin-top: 12px; padding: 10px 14px; border-radius: 7px; background: var(--red-bg); border: 1px solid #fecaca; display: flex; justify-content: space-between; align-items: center; }
+.exp-total-label { font-size: 12px; font-weight: 700; color: var(--red); }
+.exp-total-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 800; color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <div class="hdr-badge">SST ⚙</div>
+    <div>
+      <div class="hdr-title">Diagnóstico de Cumplimiento Regulatorio</div>
+      <div class="hdr-sub">Panel Analítico · Empresa Confidencial</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-tag">RIESGO MUY ALTO</div>
+    <div class="hdr-date">Auditoría: Enero 2026</div>
+    <button class="hdr-btn">↓ Descargar PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Módulos</div>
+      <div class="sb-item active"><span class="sb-icon">📊</span> Resumen Ejecutivo</div>
+      <div class="sb-item"><span class="sb-icon">⚖️</span> NOM-002 <span class="sb-badge">BLOCKER</span></div>
+      <div class="sb-item"><span class="sb-icon">🧰</span> NOM-019 <span class="sb-badge amb">3</span></div>
+      <div class="sb-item"><span class="sb-icon">📋</span> NOM-030 <span class="sb-badge">5</span></div>
+      <div class="sb-item"><span class="sb-icon">📄</span> Documentación PIA <span class="sb-badge amb">2</span></div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">
+      <div class="sb-label">Análisis</div>
+      <div class="sb-item"><span class="sb-icon">🗺️</span> Matriz de Riesgo</div>
+      <div class="sb-item"><span class="sb-icon">📅</span> Plan de Acción</div>
+      <div class="sb-item"><span class="sb-icon">💰</span> Exposición Legal</div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">
+      <div class="sb-label">Estado</div>
+      <div class="sb-item"><span class="sb-icon">✅</span> Conformidades <span class="sb-badge grn">8</span></div>
+      <div class="sb-item"><span class="sb-icon">🔁</span> En Proceso <span class="sb-badge amb">12</span></div>
+      <div class="sb-item"><span class="sb-icon">❌</span> Críticos <span class="sb-badge">47</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi red">
+        <div class="kpi-icon">📉</div>
+        <div class="kpi-value red" id="k1">0%</div>
+        <div class="kpi-label">Índice de Cumplimiento</div>
+        <div class="kpi-sub">Promedio ponderado</div>
+        <div class="kpi-risk red">CRÍTICO</div>
+      </div>
+      <div class="kpi blue">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-value blue" id="k2">0</div>
+        <div class="kpi-label">Requisitos Auditados</div>
+        <div class="kpi-sub">4 ejes normativos</div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-value red" id="k3">0</div>
+        <div class="kpi-label">Hallazgos Críticos</div>
+        <div class="kpi-sub">Con impacto legal directo</div>
+        <div class="kpi-risk amber">URGENTE</div>
+      </div>
+      <div class="kpi amber">
+        <div class="kpi-icon">🔁</div>
+        <div class="kpi-value amber" id="k4">0</div>
+        <div class="kpi-label">Acciones en Proceso</div>
+        <div class="kpi-sub">Seguimiento parcial</div>
+      </div>
+    </div>
+
+    <!-- ROW: Compliance bars + Score ring -->
+    <div class="row3">
+      <div class="card">
+        <div class="card-title">📊 Cumplimiento por Eje Normativo</div>
+        <div class="card-sub">Porcentaje de conformidad por norma auditada</div>
+        <div class="norm-row">
+          <div class="norm-header">
+            <span class="norm-name">NOM-019-STPS · Higiene y Seguridad</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="norm-badge ok">Moderado</span>
+              <span class="norm-pct green">85%</span>
+            </div>
+          </div>
+          <div class="norm-track"><div class="norm-fill green" id="b1" style="width:0%"></div></div>
+          <div class="norm-meta"><span>Comisión SST activa</span><span>17/20 req.</span></div>
+        </div>
+        <div class="norm-row">
+          <div class="norm-header">
+            <span class="norm-name">NOM-002-STPS · Protección contra Incendio</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="norm-badge blocker">BLOCKER</span>
+              <span class="norm-pct red">35%</span>
+            </div>
+          </div>
+          <div class="norm-track"><div class="norm-fill red" id="b2" style="width:0%"></div></div>
+          <div class="norm-meta"><span>Extintores sin presión · Sin brigadas</span><span>7/20 req.</span></div>
+        </div>
+        <div class="norm-row">
+          <div class="norm-header">
+            <span class="norm-name">Documentación PIA · Integridad</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="norm-badge urgente">Urgente</span>
+              <span class="norm-pct amber">52%</span>
+            </div>
+          </div>
+          <div class="norm-track"><div class="norm-fill amber" id="b3" style="width:0%"></div></div>
+          <div class="norm-meta"><span>Expedientes incompletos</span><span>16/31 req.</span></div>
+        </div>
+        <div class="norm-row">
+          <div class="norm-header">
+            <span class="norm-name">NOM-030-STPS · Servicios Preventivos</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="norm-badge blocker">BLOCKER</span>
+              <span class="norm-pct red">10%</span>
+            </div>
+          </div>
+          <div class="norm-track"><div class="norm-fill red" id="b4" style="width:0%"></div></div>
+          <div class="norm-meta"><span>Sin médico laboral · Sin programa</span><span>1/10 req.</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column">
+        <div class="card-title">🎯 Score Global</div>
+        <div class="card-sub">Índice ponderado de conformidad</div>
+        <div class="score-ring-wrap">
+          <div class="score-ring">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#fee2e2" stroke-width="12"/>
+              <circle cx="65" cy="65" r="52" fill="none" stroke="#dc2626" stroke-width="12"
+                stroke-dasharray="326.7" stroke-dashoffset="261.4"
+                stroke-linecap="round"/>
+            </svg>
+            <div class="score-ring-val">
+              <span class="num">20%</span>
+              <span class="denom">Global</span>
+            </div>
+          </div>
+          <div class="score-legend">
+            <div class="legend-row">
+              <div class="legend-label"><div class="legend-dot" style="background:var(--green)"></div>Conformes</div>
+              <div class="legend-val" style="color:var(--green)">8</div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-label"><div class="legend-dot" style="background:var(--amber)"></div>En proceso</div>
+              <div class="legend-val" style="color:var(--amber)">12</div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-label"><div class="legend-dot" style="background:var(--red)"></div>No conformes</div>
+              <div class="legend-val" style="color:var(--red)">47</div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-label"><div class="legend-dot" style="background:var(--muted)"></div>No aplica</div>
+              <div class="legend-val" style="color:var(--muted)">5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW: Hallazgos + Matriz riesgo -->
+    <div class="row2">
+      <div class="card">
+        <div class="card-title">❌ Hallazgos Prioritarios</div>
+        <div class="card-sub">Ordenados por impacto legal y urgencia de atención</div>
+        <div class="hallazgo-item">
+          <div class="h-sev red"></div>
+          <div class="h-body">
+            <div class="h-title">Todos los extintores despresurizados · Sin recarga</div>
+            <div class="h-norm">NOM-002-STPS-2010 · Art. 5.8</div>
+          </div>
+          <div class="h-chip blocker">BLOCKER</div>
+        </div>
+        <div class="hallazgo-item">
+          <div class="h-sev red"></div>
+          <div class="h-body">
+            <div class="h-title">Sin Programa Interno de Protección Civil (PIPC)</div>
+            <div class="h-norm">LGPC · Art. 39 bis</div>
+          </div>
+          <div class="h-chip blocker">BLOCKER</div>
+        </div>
+        <div class="hallazgo-item">
+          <div class="h-sev red"></div>
+          <div class="h-body">
+            <div class="h-title">Sin médico laboral ni contrato de servicios preventivos</div>
+            <div class="h-norm">NOM-030-STPS-2009 · Art. 6</div>
+          </div>
+          <div class="h-chip blocker">BLOCKER</div>
+        </div>
+        <div class="hallazgo-item">
+          <div class="h-sev amber"></div>
+          <div class="h-body">
+            <div class="h-title">Expedientes médicos de empleados incompletos</div>
+            <div class="h-norm">NOM-030 / NOM-035-STPS</div>
+          </div>
+          <div class="h-chip urgente">URGENTE</div>
+        </div>
+        <div class="hallazgo-item">
+          <div class="h-sev amber"></div>
+          <div class="h-body">
+            <div class="h-title">Sin señalética específica de EPP en laboratorio</div>
+            <div class="h-norm">NOM-026-STPS-2008</div>
+          </div>
+          <div class="h-chip proceso">EN PROCESO</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🗺️ Matriz de Riesgo</div>
+        <div class="card-sub">Probabilidad × Severidad de hallazgos</div>
+        <div class="matrix-grid" id="matrix">
+          <!-- Row 4 (high prob) -->
+          <div class="mat-label">Probabilidad</div>
+          <div class="mat-cell m-high">Alta</div>
+          <div class="mat-cell m-crit"></div>
+          <div class="mat-cell m-crit"></div>
+          <div class="mat-cell m-crit"></div>
+          <!-- Row 3 -->
+          <div></div>
+          <div class="mat-cell m-mod">Media</div>
+          <div class="mat-cell m-high"></div>
+          <div class="mat-cell m-crit"></div>
+          <div class="mat-cell m-crit"></div>
+          <!-- Row 2 -->
+          <div></div>
+          <div class="mat-cell m-low">Baja</div>
+          <div class="mat-cell m-mod"></div>
+          <div class="mat-cell m-high"></div>
+          <div class="mat-cell m-crit"></div>
+          <!-- Row 1 -->
+          <div></div>
+          <div class="mat-cell m-low">Mín</div>
+          <div class="mat-cell m-low"></div>
+          <div class="mat-cell m-mod"></div>
+          <div class="mat-cell m-high"></div>
+          <!-- X labels -->
+          <div></div>
+          <div class="mat-label-b">Menor</div>
+          <div class="mat-label-b">Moderada</div>
+          <div class="mat-label-b">Mayor</div>
+          <div class="mat-label-b">Catastróf.</div>
+        </div>
+        <!-- Dots positioned via JS -->
+        <div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center">Severidad →</div>
+      </div>
+    </div>
+
+    <!-- ROW: Timeline + Exposición -->
+    <div class="row2">
+      <div class="card">
+        <div class="card-title">📅 Plan de Acción</div>
+        <div class="card-sub">Hoja de ruta de remediación post-auditoría</div>
+        <div class="timeline-item">
+          <div class="tl-dot done">✓</div>
+          <div class="tl-content">
+            <div class="tl-name">Auditoría inicial completada</div>
+            <div class="tl-desc">72 requisitos evaluados · 4 ejes normativos</div>
+            <div class="tl-date">Semana 1 · Completado</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot active">→</div>
+          <div class="tl-content">
+            <div class="tl-name">Entrega del informe ejecutivo</div>
+            <div class="tl-desc">Dashboard + PDF con hallazgos y recomendaciones</div>
+            <div class="tl-date">Semana 2 · En Progreso</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot pend">3</div>
+          <div class="tl-content">
+            <div class="tl-name">Remediación de hallazgos BLOCKER</div>
+            <div class="tl-desc">Extintores, PIPC, médico laboral</div>
+            <div class="tl-date">Semana 3–4 · Pendiente</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot pend">4</div>
+          <div class="tl-content">
+            <div class="tl-name">Auditoría de verificación</div>
+            <div class="tl-desc">Confirmación de cierre de no conformidades</div>
+            <div class="tl-date">Semana 6 · Pendiente</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💰 Exposición Legal Estimada</div>
+        <div class="card-sub">Multas potenciales por incumplimiento activo</div>
+        <div class="exposure-item">
+          <span class="exp-norm">NOM-002 (Incendio)</span>
+          <span class="exp-range">$250k – $1,000k</span>
+        </div>
+        <div class="exposure-item">
+          <span class="exp-norm">NOM-030 (Servicios prev.)</span>
+          <span class="exp-range">$250k – $1,000k</span>
+        </div>
+        <div class="exposure-item">
+          <span class="exp-norm">Documentación PIA</span>
+          <span class="exp-range">$50k – $500k</span>
+        </div>
+        <div class="exposure-item">
+          <span class="exp-norm">NOM-019 (Parcial)</span>
+          <span class="exp-range">$30k – $200k</span>
+        </div>
+        <div class="exposure-item">
+          <span class="exp-norm">Suspensión de actividades</span>
+          <span class="exp-range">Riesgo alto</span>
+        </div>
+        <div class="exposure-total">
+          <span class="exp-total-label">Exposición total estimada</span>
+          <span class="exp-total-val">≤ $2.7M MXN</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Animate KPI counters
+function animateCount(id, target, suffix='', duration=1200) {
+  const el = document.getElementById(id);
+  let start = 0, startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(ease * target) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Animate bars
+function animateBar(id, pct, delay=0) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.style.width = pct + '%';
+  }, delay);
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    animateCount('k1', 20, '%');
+    animateCount('k2', 72);
+    animateCount('k3', 47);
+    animateCount('k4', 12);
+    animateBar('b1', 85, 200);
+    animateBar('b2', 35, 350);
+    animateBar('b3', 52, 500);
+    animateBar('b4', 10, 650);
+  }, 300);
+});
+</script>
+</body>
+</html>
