@@ -1,9 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/DIGITAL%20CODE/index.html",
-      "permanent": false
-    }
-  ]
+  "cleanUrls": true
 }
